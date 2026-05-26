@@ -12,7 +12,7 @@ from churn_preprocessing import align_prediction_columns, preprocess_raw_data
 
 
 MODELS_DIR = Path("models")
-MODEL_PATH = MODELS_DIR / "churn_model.joblib"
+MODEL_PATH = MODELS_DIR / "best_churn_model_decision_tree.joblib"
 MAPPINGS_PATH = MODELS_DIR / "ordinal_mappings.json"
 
 
