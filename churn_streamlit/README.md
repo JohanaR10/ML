@@ -5,6 +5,16 @@ Esta carpeta separa el proyecto en dos pasos:
 1. Entrenar y guardar el modelo con el CSV historico.
 2. Abrir una app web en Streamlit para subir clientes nuevos y calcular su probabilidad de churn.
 
+La app actual esta adaptada al modelo:
+
+```text
+models/best_churn_model_decision_tree_v2.joblib
+```
+
+Si ese archivo no existe, la app usa como respaldo `models/best_churn_model_decision_tree.joblib`.
+
+Tambien carga `models/ordinal_mappings.json` para convertir las categorias del CSV original al formato numerico que espera el modelo.
+
 ## 1. Instalar librerias
 
 ```powershell
@@ -60,6 +70,33 @@ O con el script listo para este equipo:
 
 Streamlit abrira una pagina local. Ahi subes el CSV de clientes a evaluar y descargas `predicciones_churn.csv`.
 
+La app incluye un checkbox para probar directamente con datos incluidos:
+
+```text
+altas_Bajas_target_checkbox.csv
+altas_Bajas_notarget_checkbox.csv
+```
+
+El primero trae `PERIODO_BAJA` para evaluar contra `churn_real`; el segundo no trae variable objetivo y solo genera predicciones.
+
+Si subes un archivo manualmente, manten por defecto:
+
+- Separador: `|`
+
+La app detecta internamente el encoding entre `utf-8`, `utf-16` y `latin1`, por eso no muestra un selector de encoding en la interfaz.
+
+## Salidas de la app
+
+Despues de ejecutar el analisis, la app muestra:
+
+- Vista previa del archivo cargado.
+- Conteo de clientes evaluados, churn predicho, no churn predicho y probabilidad promedio.
+- Distribucion de resultados.
+- Matriz de confusion y reporte de clasificacion si el archivo trae `PERIODO_BAJA`.
+- Top 10 variables mas influyentes del arbol de decision.
+- Tabla de predicciones ordenada por probabilidad de churn.
+- Descarga en CSV o Excel de todas las predicciones, solo churn o solo no churn.
+
 ## Columnas importantes
 
 El archivo historico de entrenamiento debe traer `PERIODO_BAJA`, porque de ahi se construye la variable objetivo:
@@ -84,11 +121,7 @@ En este proyecto ya quedo creado desde `Proyecto_Churn_Clientes_Movistar_v23.ipy
 
 ## Archivos de prueba
 
-Para probar la app con datos sinteticos:
+Para probar la app con los datos incluidos usa el checkbox `Usar datos incluidos` y selecciona:
 
-```text
-datos_sinteticos_formato_original.csv
-datos_sinteticos_model_ready.csv
-```
-
-Usa `datos_sinteticos_formato_original.csv` para probar el flujo completo con CSV crudo.
+- `Con variable objetivo (PERIODO_BAJA)`
+- `Sin variable objetivo`
