@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 import streamlit as st
-from sklearn.metrics import ConfusionMatrixDisplay, classification_report
+from sklearn.metrics import ConfusionMatrixDisplay, classification_report, roc_auc_score
 
 from churn_preprocessing import align_prediction_columns, build_target, preprocess_raw_data
 
@@ -322,6 +322,7 @@ if cached is None:
 
 results_df = cached["results_df"]
 predictions = cached["predictions"]
+probabilities = cached["probabilities"]
 target = cached["target"]
 feature_importances = cached["feature_importances"]
 input_columns = cached["input_columns"]
@@ -361,6 +362,10 @@ if target is not None:
         target_names=["No churn", "Churn"],
         zero_division=0,
     )
+    if target.nunique() > 1:
+        report = f"{report}\nROC AUC: {roc_auc_score(target, probabilities):.4f}"
+    else:
+        report = f"{report}\nROC AUC: No disponible, churn_real tiene una sola clase."
     st.code(report, language="text")
 
 if feature_importances is not None:
