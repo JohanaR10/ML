@@ -31,13 +31,11 @@ churn_preprocessing.py
 requirements.txt
 models/best_churn_model_decision_tree_v2.joblib
 models/ordinal_mappings.json
-altas_Bajas_target_checkbox.csv
 altas_Bajas_notarget_checkbox.csv
 ```
 
-Los dos CSV incluidos permiten probar la app desde el checkbox `Usar datos incluidos`:
+El CSV incluido permite probar la app desde el checkbox `Usar datos incluidos`:
 
-- `Con variable objetivo (PERIODO_BAJA)`: permite mostrar `churn_real`, matriz de confusion y reporte de clasificacion.
-- `Sin variable objetivo`: solo genera predicciones.
+- `altas_Bajas_notarget_checkbox.csv`: genera predicciones sin variable objetivo.
 
 La app detecta internamente el encoding entre `utf-8`, `utf-16` y `latin1`. El separador esperado por defecto es `|`.

@@ -21,7 +21,6 @@ from churn_preprocessing import align_prediction_columns, build_target, preproce
 MODELS_DIR = BASE_DIR / "models"
 PREFERRED_MODEL_PATH = MODELS_DIR / "best_churn_model_decision_tree_v2.joblib"
 MAPPINGS_PATH = MODELS_DIR / "ordinal_mappings.json"
-INCLUDED_DATA_WITH_TARGET_PATH = BASE_DIR / "altas_Bajas_target_checkbox.csv"
 INCLUDED_DATA_NOTARGET_PATH = BASE_DIR / "altas_Bajas_notarget_checkbox.csv"
 CSV_ENCODINGS = ("utf-8", "utf-16", "latin1")
 RESULTS_STATE_KEY = "churn_app_results"
