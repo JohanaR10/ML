@@ -14,7 +14,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 import streamlit as st
-from sklearn.metrics import ConfusionMatrixDisplay, classification_report, roc_auc_score
 
 from churn_preprocessing import align_prediction_columns, build_target, preprocess_raw_data
 
@@ -131,23 +130,6 @@ def get_feature_importances(model, feature_columns: list[str]) -> pd.DataFrame |
     )
 
 
-def plot_confusion_matrix(y_true: pd.Series, y_pred) -> plt.Figure:
-    fig, ax = plt.subplots(figsize=(4.2, 3.4))
-    ConfusionMatrixDisplay.from_predictions(
-        y_true,
-        y_pred,
-        cmap="Blues",
-        display_labels=["No churn", "Churn"],
-        ax=ax,
-    )
-    ax.grid(False)
-    ax.set_xticks([0, 1])
-    ax.set_yticks([0, 1])
-    ax.tick_params(axis="x", rotation=90)
-    ax.set_title("Confusion Matrix for Decision Tree")
-    return fig
-
-
 def plot_feature_importance(feature_importances: pd.DataFrame) -> plt.Figure:
     top_10_features = feature_importances.head(10)
     sns.set_theme(style="whitegrid")
@@ -244,7 +226,7 @@ with st.sidebar:
 
 uploaded_file = st.file_uploader("CSV de clientes", type=["csv"])
 included_files_available = (
-    INCLUDED_DATA_WITH_TARGET_PATH.exists() and INCLUDED_DATA_NOTARGET_PATH.exists()
+    INCLUDED_DATA_NOTARGET_PATH.exists()
 )
 use_included_data = st.checkbox(
     "Usar datos incluidos",
@@ -252,25 +234,13 @@ use_included_data = st.checkbox(
     disabled=not included_files_available,
 )
 
-included_data_options = {
-    "Con variable objetivo (PERIODO_BAJA)": INCLUDED_DATA_WITH_TARGET_PATH,
-    "Sin variable objetivo": INCLUDED_DATA_NOTARGET_PATH,
-}
-included_data_label = None
-if use_included_data:
-    included_data_label = st.radio(
-        "Archivo incluido",
-        list(included_data_options.keys()),
-        horizontal=True,
-    )
-
 if uploaded_file is None and not use_included_data:
     st.info("Carga un CSV o activa los datos incluidos para calcular el riesgo de churn.")
     st.stop()
 
 try:
-    if use_included_data and included_data_label is not None:
-        included_path = included_data_options[included_data_label]
+    if use_included_data:
+        included_path = INCLUDED_DATA_NOTARGET_PATH
         raw_df = load_included_data(included_path, sep)
         data_key = f"{included_path}_{included_path.stat().st_mtime}_{sep}"
     elif uploaded_file is not None:
@@ -321,9 +291,6 @@ if cached is None:
     st.stop()
 
 results_df = cached["results_df"]
-predictions = cached["predictions"]
-probabilities = cached["probabilities"]
-target = cached["target"]
 feature_importances = cached["feature_importances"]
 input_columns = cached["input_columns"]
 
@@ -347,26 +314,6 @@ counts = results_df["estado_churn"].value_counts().reindex(
     fill_value=0,
 )
 st.bar_chart(counts)
-
-if target is not None:
-    st.write("### Confusion Matrix")
-    fig = plot_confusion_matrix(target, predictions)
-    st.pyplot(fig, width=420)
-    plt.close(fig)
-
-    st.write("### Classification Report")
-    report = classification_report(
-        target,
-        predictions,
-        labels=[0, 1],
-        target_names=["No churn", "Churn"],
-        zero_division=0,
-    )
-    if target.nunique() > 1:
-        report = f"{report}\nROC AUC: {roc_auc_score(target, probabilities):.4f}"
-    else:
-        report = f"{report}\nROC AUC: No disponible, churn_real tiene una sola clase."
-    st.code(report, language="text")
 
 if feature_importances is not None:
     st.write("### Feature Importance")
