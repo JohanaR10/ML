@@ -90,7 +90,7 @@ def read_csv_auto_encoding(source, sep: str) -> pd.DataFrame:
 
 
 @st.cache_data
-def load_included_data(path: Path, sep: str) -> pd.DataFrame:
+def load_included_data(path: Path, sep: str, file_mtime: float, file_size: int) -> pd.DataFrame:
     return read_csv_auto_encoding(path, sep)
 
 
@@ -241,8 +241,14 @@ if uploaded_file is None and not use_included_data:
 try:
     if use_included_data:
         included_path = INCLUDED_DATA_NOTARGET_PATH
-        raw_df = load_included_data(included_path, sep)
-        data_key = f"{included_path}_{included_path.stat().st_mtime}_{sep}"
+        included_stat = included_path.stat()
+        raw_df = load_included_data(
+            included_path,
+            sep,
+            included_stat.st_mtime,
+            included_stat.st_size,
+        )
+        data_key = f"{included_path}_{included_stat.st_mtime}_{included_stat.st_size}_{sep}"
     elif uploaded_file is not None:
         raw_df = read_uploaded_csv(uploaded_file, sep=sep)
         data_key = f"{uploaded_file.name}_{uploaded_file.size}_{sep}"
