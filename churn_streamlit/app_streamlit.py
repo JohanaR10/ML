@@ -21,8 +21,6 @@ from churn_preprocessing import align_prediction_columns, build_target, preproce
 
 MODELS_DIR = BASE_DIR / "models"
 PREFERRED_MODEL_PATH = MODELS_DIR / "best_churn_model_decision_tree_v2.joblib"
-LEGACY_MODEL_PATH = MODELS_DIR / "best_churn_model_decision_tree.joblib"
-FALLBACK_MODEL_PATH = MODELS_DIR / "churn_model.joblib"
 MAPPINGS_PATH = MODELS_DIR / "ordinal_mappings.json"
 INCLUDED_DATA_WITH_TARGET_PATH = BASE_DIR / "altas_Bajas_target_checkbox.csv"
 INCLUDED_DATA_NOTARGET_PATH = BASE_DIR / "altas_Bajas_notarget_checkbox.csv"
@@ -38,12 +36,8 @@ st.set_page_config(page_title="Prediccion de Churn Movistar", layout="wide")
 def load_model():
     if PREFERRED_MODEL_PATH.exists():
         model_files = [PREFERRED_MODEL_PATH]
-    elif LEGACY_MODEL_PATH.exists():
-        model_files = [LEGACY_MODEL_PATH]
-    elif FALLBACK_MODEL_PATH.exists():
-        model_files = [FALLBACK_MODEL_PATH]
     else:
-        model_files = sorted(MODELS_DIR.glob("*.joblib"))
+        model_files = []
 
     if not model_files:
         return None
@@ -240,8 +234,7 @@ st.caption("Carga clientes, ejecuta el analisis y prioriza los casos con mayor r
 
 if artifact is None:
     st.error(
-        "No encontre un modelo .joblib en models/. Agrega best_churn_model_decision_tree.joblib "
-        "o entrena uno con train_churn_model.py."
+        "No encontre el modelo models/best_churn_model_decision_tree_v2.joblib."
     )
     st.stop()
 
